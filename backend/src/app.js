@@ -1,10 +1,13 @@
 const express = require('express');
+const userRoutes = require('routes/userRoutes');
+const demoRoute = require('routes/demoRoute');
+require('dotenv').config();
 
 const app = express();
 
 //Routing
-const demoRoute = require('./routes/demoRoute');
 app.use('/api/example', demoRoute);
+app.use('/api', userRoutes);
 
 module.exports = app;
 
