@@ -1,4 +1,4 @@
-const { getUser, createUser } = require('models/userModel');
+const { getUser, createUser, updateUser, deleteUser } = require('models/userModel');
 
 const getUserHandler = async (req, res) => {
     const userId = req.params.userId;
@@ -26,7 +26,32 @@ const createUserHandler = async (req, res) => {
     }
 }
 
+const updateUserHandler = async (req, res) => {
+    const userId = req.params.userId;
+    const updateParams = req.body;
+
+    try {
+        const updatedUser = await updateUser(userId, updateParams);
+        res.status(200).json({ message: "User Updated successfully ", user: updatedUser});
+    } catch (error){
+        res.status(500).json({error: "Error updating user"});
+    }
+}
+
+const deleteUserHandler = async (req, res) => {
+    const { userId } = req.params;
+
+    try {
+        await deleteUser(userId);
+        res.status(200).json({message: "User deleted successfully"});
+    } catch (error) {
+        res.status(500).json({error: "Error deleting user"});
+    }
+}
+
 module.exports = {
     getUserHandler,
     createUserHandler,
+    updateUserHandler,
+    deleteUserHandler
 };
