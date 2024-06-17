@@ -8,4 +8,6 @@ router.post('/users', createUserHandler);
 router.put('/users/:userId', updateUserHandler);
 router.delete('/users/:userId', deleteUserHandler);
 
+router.post('/signup', createUserHandler);
+
 module.exports = router;
