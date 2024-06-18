@@ -11,7 +11,6 @@ const getUser = async (userId) => {
 
 	try {
 		const data = await db.get(params).promise();
-		console.log('User retrieved:', data.Item);
 		return data.Item;
 	} catch (error) {
 		console.error('Error retrieving user:', error);

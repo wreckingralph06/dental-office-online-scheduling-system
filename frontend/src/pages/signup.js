@@ -1,21 +1,28 @@
 import { Container, Typography, TextField, Button, Box, Link } from '@mui/material';
 import NextLink from 'next/link';
 import { useState } from 'react';
+import { useRouter } from 'next/router';
+import { signupUser } from '@/utils/api';
 
 const Signup = () => {
-  const [formData, setFormData] = useState({
-    username: '',
-    email: '',
-    password: '',
-  });
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
+	const [error, setError] = useState('');
+	const router = useRouter();
 
-  const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-  };
-
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log(formData);
+		setError('');
+
+    try {
+      await signupUser({ email, password, firstName, lastName });
+			router.push('/signin');
+    } catch (error) {
+			setError(error.message || 'Error signing up');
+      console.error('Error signing up:', error);
+    }
   };
 
   return (
@@ -30,10 +37,18 @@ const Signup = () => {
 				>
 					<TextField
 						margin="normal"
-						label="Username"
-						name="username"
-						value={formData.username}
-						onChange={handleChange}
+						label="First Name"
+						name="firstName"
+						value={firstName}
+						onChange={(e) => setFirstName(e.target.value)}
+						sx={{ width: '60%' }}
+					/>
+					<TextField
+						margin="normal"
+						label="Last Name"
+						name="lastName"
+						value={lastName}
+						onChange={(e) => setLastName(e.target.value)}
 						sx={{ width: '60%' }}
 					/>
 					<TextField
@@ -41,8 +56,8 @@ const Signup = () => {
 						label="Email"
 						type="email"
 						name="email"
-						value={formData.email}
-						onChange={handleChange}
+						value={email}
+						onChange={(e) => setEmail(e.target.value)}
 						sx={{ width: '60%' }}
 					/>
 					<TextField
@@ -50,10 +65,15 @@ const Signup = () => {
 						label="Password"
 						type="password"
 						name="password"
-						value={formData.password}
-						onChange={handleChange}
+						value={password}
+						onChange={(e) => setPassword(e.target.value)}
 						sx={{ width: '60%' }}
 					/>
+					{error && (
+            <Typography variant="body2" color="error" align="center">
+              {error}
+            </Typography>
+          )}
 					<Button
 						type="submit"
 						variant="contained"
