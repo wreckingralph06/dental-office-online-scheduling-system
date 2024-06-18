@@ -17,23 +17,66 @@ const getUser = async (userId) => {
 	}
 };
 
+const getUserByEmail = async (email) => {
+	const emailLookupParams = {
+			TableName: 'emailLookup',
+			KeyConditionExpression: 'email = :email',
+			ExpressionAttributeValues: {
+				':email': email
+			}
+	};
+
+	try {
+		const emailLookupResult = await db.query(emailLookupParams).promise();
+		if (emailLookupResult.Items.length === 0) {
+				throw new Error('User not found');
+		}
+		const { userId } = emailLookupResult.Items[0];
+
+		const userParams = {
+				TableName: 'users',
+				Key: {
+						userId
+				}
+		};
+
+		const userResult = await db.get(userParams).promise();
+		return userResult.Item;
+	} catch (error) {
+			console.error('Error getting user by email: ', error);
+			throw new Error('Error getting user by email');
+	}
+};
+
 const createUser = async (user) => {
 	const userId = uuidv4();
-	const passwordHash = await bcrypt.hash(user.password, 10);
 	const timestamp = new Date().toISOString();
-	const params = {
+	const { email, password, firstName, lastName } = user;
+
+	const userParams = {
 		TableName: tableName,
 		Item: {
 			userId,
-			passwordHash,
+			firstName,
+			lastName,
+			email,
+			passwordHash: await bcrypt.hash(password, 10),
 			createdAt: timestamp,
 			updatedAt: timestamp,
-			...user,
 		}
 	}
 
+	const emailLookupParams = {
+		TableName: 'emailLookup',
+		Item: {
+				email,
+				userId
+		}
+	};
+
 	try {
-		await db.put(params).promise();
+		await db.put(userParams).promise();
+		await db.put(emailLookupParams).promise();
 		console.log("User created successfully.");
 	} catch (error) {
 		console.log("Error creating user: ", error);
@@ -86,6 +129,7 @@ const deleteUser = async (userId) => {
 
 module.exports = {
 	getUser,
+	getUserByEmail,
 	createUser,
 	updateUser,
 	deleteUser
