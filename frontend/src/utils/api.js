@@ -13,3 +13,15 @@ export const signupUser = async (userData) => {
     throw error.response ? error.response.data : new Error('Error signing up');
   }
 };
+
+export const signinUser = async (userData) => {
+  try {
+    const response = await axios.post('/signin', userData);
+    console.log(response.data);
+    const { token } = response.data;
+    localStorage.setItem('token', token);
+    return response.data;
+  } catch (error) {
+    throw error.response ? error.response.data : new Error('Error signing in');
+  }
+};
