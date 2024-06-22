@@ -17,7 +17,7 @@ const Signup = () => {
 		setError('');
 
     try {
-      await signupUser({ email, password, firstName, lastName });
+    	await signupUser({ email, password, firstName, lastName });
 			router.push('/signin');
     } catch (error) {
 			setError(error.message || 'Error signing up');
